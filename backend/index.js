@@ -11,6 +11,8 @@ const experienceRoutes = require('./routes/experience');
 const skillsRoutes = require('./routes/skills');
 const linksRoutes = require('./routes/links');
 const achievementsRoutes = require('./routes/achievements');
+const usersRoutes = require('./routes/users');
+const latexRoutes = require('./routes/latex');
 
 const app = express();
 dotenv.config();
@@ -36,6 +38,8 @@ app.use('/api/experience', experienceRoutes);
 app.use('/api/skills', skillsRoutes);
 app.use('/api/links', linksRoutes);
 app.use('/api/achievements', achievementsRoutes);
+app.use('/api/users', usersRoutes);
+app.use('/api/latex', latexRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

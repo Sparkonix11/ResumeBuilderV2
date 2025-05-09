@@ -13,16 +13,23 @@ exports.getAllUsers = async (req, res) => {
 
 exports.getUserById = async (req, res) => {
     try {
-        const { id } = req.params;
-        const user = await Users.findByPk(id, {
-            attributes: ['id', 'name', 'phone'],
-        });
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
+        // Use the authenticated user's ID from req.user
+        console.log('getUserById called');
+        console.log('Request user object:', req.user);
+        
+        const userId = req.user?.id;
+        console.log('Fetching user info with ID:', userId);
+        
+        if (!userId) {
+            console.error('No user ID available in the request');
+            return res.status(401).json({ message: 'Not authenticated or missing user ID' });
         }
+        
+        const user = await Users.findByPk(userId);
         res.status(200).json(user);
     } catch (error) {
-        res.status(500).json({ message: 'Error fetching user' });
+        console.error('Error fetching user information:', error);
+        res.status(500).json({ message: 'Failed to fetch personal information' });
     }
 }
 
@@ -41,28 +48,42 @@ exports.createUser = async (req, res) => {
 
 exports.updateUser = async (req, res) => {
     try {
-        const { id } = req.params;
+        // Use the authenticated user's ID from req.user instead of params
+        const userId = req.user.id;
         const { name, phone } = req.body;
-        const user = await Users.findByPk(id);
+        
+        const user = await Users.findByPk(userId);
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
+        
+        // Update only name and phone (not email and password)
         user.name = name;
         user.phone = phone;
+        
         await user.save();
-        res.status(200).json(user);
+        res.status(200).json({
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            phone: user.phone
+        });
     } catch (error) {
-        res.status(500).json({ message: 'Error updating user' });
+        console.error('Error updating user information:', error);
+        res.status(500).json({ message: 'Failed to save personal information' });
     }
 }
 
 exports.deleteUser = async (req, res) => {
     try {
-        const { id } = req.params;
-        const user = await Users.findByPk(id);
+        // Use the authenticated user's ID from req.user instead of params
+        const userId = req.user.id;
+        const user = await Users.findByPk(userId);
+        
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
+        
         await user.destroy();
         res.status(200).json({ message: 'User deleted successfully' });
     } catch (error) {
