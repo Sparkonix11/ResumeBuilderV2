@@ -67,6 +67,9 @@ const ResumePreview = () => {
   const [latexCode, setLatexCode] = useState<string>('');
   const [missingSections, setMissingSections] = useState<string[]>([]);
   const [pdfPreviewUrl, setPdfPreviewUrl] = useState<string | null>(null);
+  const [selectedProjects, setSelectedProjects] = useState<{ [id: string]: boolean }>({});
+  const [selectedExperiences, setSelectedExperiences] = useState<{ [id: string]: boolean }>({});
+  const [showSelectionOptions, setShowSelectionOptions] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchResumeData = async () => {
@@ -282,6 +285,23 @@ const ResumePreview = () => {
       return;
     }
 
+    // Initialize checkbox states when first loading data
+    if (Object.keys(selectedProjects).length === 0 && data.projects && data.projects.length > 0) {
+      const initialProjectsState: { [id: string]: boolean } = {};
+      data.projects.forEach((_, index) => {
+        initialProjectsState[index] = true;
+      });
+      setSelectedProjects(initialProjectsState);
+    }
+
+    if (Object.keys(selectedExperiences).length === 0 && data.experience && data.experience.length > 0) {
+      const initialExperiencesState: { [id: string]: boolean } = {};
+      data.experience.forEach((_, index) => {
+        initialExperiencesState[index] = true;
+      });
+      setSelectedExperiences(initialExperiencesState);
+    }
+
     let latex = `%-------------------------
 % Resume in Latex
 % Author : ${escapeLatex(data.personalInfo.name)}
@@ -439,79 +459,92 @@ const ResumePreview = () => {
 
     // Projects Section (prioritized as shown in your template)
     if (data.projects && data.projects.length > 0) {
-      latex += `%-----------PROJECTS-----------
+      // Filter out unselected projects
+      const filteredProjects = data.projects.filter((_, index) => selectedProjects[index] !== false);
+      
+      if (filteredProjects.length > 0) {
+        latex += `%-----------PROJECTS-----------
 \\section{Projects}
   \\resumeSubHeadingListStart
 `;
 
-      data.projects.forEach(project => {
-        let githubLink = '';
-        if (project.githubUrl) {
-          githubLink = `\\href{${escapeLatex(project.githubUrl)}}{\\underline{GitHub}}`;
-        }
+        filteredProjects.forEach(project => {
+          let githubLink = '';
+          if (project.githubUrl) {
+            githubLink = `\\href{${escapeLatex(project.githubUrl)}}{\\underline{GitHub}}`;
+          }
 
-        latex += `    \\resumeSubheading
+          latex += `    \\resumeSubheading
       {\\textbf{${escapeLatex(project.title)}}}{${githubLink}}
       {${escapeLatex(project.technologies)}}{}
-      \\resumeItemListStart
-        \\resumeItem{${escapeLatex(project.description)}}`;
+      \\resumeItemListStart`;
 
-        if (Array.isArray(project.highlights)) {
-          project.highlights.forEach(highlight => {
-            if (highlight.trim()) {
-              latex += `
+          if (Array.isArray(project.highlights)) {
+            project.highlights.forEach(highlight => {
+              if (highlight.trim()) {
+                latex += `
         \\resumeItem{${escapeLatex(highlight)}}`;
-            }
-          });
-        }
+              }
+            });
+          } else if (project.description) {
+            // Only add description if no highlights are available
+            latex += `
+        \\resumeItem{${escapeLatex(project.description)}}`;
+          }
+
+          latex += `
+      \\resumeItemListEnd`;
+        });
 
         latex += `
-      \\resumeItemListEnd`;
-      });
-
-      latex += `
   \\resumeSubHeadingListEnd
 
 `;
+      }
     }
 
     // Experience Section
     if (data.experience && data.experience.length > 0) {
-      latex += `%-----------EXPERIENCE-----------
+      // Filter out unselected experiences
+      const filteredExperiences = data.experience.filter((_, index) => selectedExperiences[index] !== false);
+      
+      if (filteredExperiences.length > 0) {
+        latex += `%-----------EXPERIENCE-----------
 \\section{Experience}
   \\resumeSubHeadingListStart
 `;
 
-      data.experience.forEach(exp => {
-        latex += `    \\resumeSubheading
+        filteredExperiences.forEach(exp => {
+          latex += `    \\resumeSubheading
       {${escapeLatex(exp.company)}}{${escapeLatex(exp.location)}}
       {${escapeLatex(exp.position)}}{${formatDate(exp.startDate)} -- ${exp.current ? 'Present' : formatDate(exp.endDate || '')}}
       \\resumeItemListStart`;
 
-        if (Array.isArray(exp.responsibilities)) {
-          exp.responsibilities.forEach(responsibility => {
-            if (responsibility.trim()) {
-              latex += `
+          if (Array.isArray(exp.responsibilities)) {
+            exp.responsibilities.forEach(responsibility => {
+              if (responsibility.trim()) {
+                latex += `
         \\resumeItem{${escapeLatex(responsibility)}}`;
-            }
-          });
-        }
+              }
+            });
+          }
+
+          latex += `
+      \\resumeItemListEnd`;
+        });
 
         latex += `
-      \\resumeItemListEnd`;
-      });
-
-      latex += `
   \\resumeSubHeadingListEnd
 
 `;
+      }
     }
     
     // Achievements Section
     if (data.achievements && data.achievements.length > 0) {
       latex += `%-----------ACHIEVEMENTS-----------
 \\section{Achievements}
-\\resumeItemListStart
+\\begin{itemize}[itemsep=1pt,label=\\scriptsize\\textbullet]
 `;
 
       data.achievements.forEach(achievement => {
@@ -519,7 +552,8 @@ const ResumePreview = () => {
 `;
       });
 
-      latex += `\\resumeItemListEnd
+      latex += `\\end{itemize}
+
 
 `;
     }
@@ -529,12 +563,13 @@ const ResumePreview = () => {
       latex += `%-----------TECHNICAL SKILLS-----------
 \\section{Technical Skills}
  \\begin{itemize}[leftmargin=0.15in, label={}]
-    \\small{`;
+    \\small{\\item`;
 
       data.skills.categories.forEach((category, index) => {
-        latex += `\\item\\textbf{${escapeLatex(category.name)}}{: ${escapeLatex(category.skills.join(', '))}}`;
+        latex += `\\textbf{${escapeLatex(category.name)}}{: ${escapeLatex(category.skills.join(', '))}}`;
         if (index < data.skills.categories.length - 1) {
-          latex += ` \\\\`;
+          latex += ` \\\\
+    `;
         }
       });
 
@@ -547,12 +582,12 @@ const ResumePreview = () => {
     // You'll need to update your data model to include coursework
     latex += `%-----------RELEVANT COURSEWORK-----------
 \\section{Relevant Coursework}
-\\resumeItemListStart
+\\begin{itemize}[itemsep=1pt,label=\\scriptsize\\textbullet]
   \\resumeItem{Programming in Python, Programming Concepts using Java, Data Structures and Algorithms}
   \\resumeItem{Database Management Systems, System Commands, Software Engineering, Software Testing}
   \\resumeItem{Modern Application Development, Computational Thinking}
   \\resumeItem{Mathematics for Data Science, Statistics for Data Science}
-\\resumeItemListEnd
+\\end{itemize}
 
 `;
 
@@ -569,10 +604,39 @@ const ResumePreview = () => {
     const date = new Date(dateString);
     const monthNames = [
       'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+      'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'
     ];
     
     return `${monthNames[date.getMonth()]}. ${date.getFullYear()}`;
+  };
+
+  // Function to parse markdown-style bold text (replace **text** with <strong> tags)
+  const parseBoldText = (text: string): JSX.Element => {
+    if (!text) return <></>;
+    
+    try {
+      // Split by ** markers
+      const parts = text.split(/(\*\*.*?\*\*)/g);
+      
+      return (
+        <>
+          {parts.map((part, i) => {
+            // Check if this part is surrounded by **
+            if (part.startsWith('**') && part.endsWith('**') && part.length > 4) {
+              // Extract the text between ** markers and make it bold
+              const boldText = part.slice(2, -2);
+              return <strong key={i}>{boldText}</strong>;
+            }
+            // Return regular text
+            return <span key={i}>{part}</span>;
+          })}
+        </>
+      );
+    } catch (error) {
+      // Fallback in case of any error
+      console.error("Error parsing bold text:", error);
+      return <>{text}</>;
+    }
   };
 
   const escapeLatex = (text: any): string => {
@@ -581,16 +645,20 @@ const ResumePreview = () => {
     // Convert to string if it's not already
     const textString = typeof text === 'string' ? text : String(text);
     
-    return textString
+    // Handle special characters first (except braces which we'll handle after bold formatting)
+    let processedText = textString
       .replace(/&/g, '\\&')
       .replace(/%/g, '\\%')
       .replace(/\\$/g, '\\$')
       .replace(/#/g, '\\#')
       .replace(/_/g, '\\_')
-      .replace(/{/g, '\\{')
-      .replace(/}/g, '\\}')
       .replace(/~/g, '\\textasciitilde{}')
       .replace(/\^/g, '\\textasciicircum{}');
+      
+    // Handle bold formatting (convert **text** to \textbf{$1})
+    processedText = processedText.replace(/\*\*(.*?)\*\*/g, '\\textbf{$1}');
+    
+    return processedText;
   };
 
   const copyToClipboard = () => {
@@ -757,11 +825,10 @@ const ResumePreview = () => {
                       Download LaTeX File
                     </button>
                     <button
-                      onClick={downloadPDF}
-                      className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700"
-                      disabled={!latexCode}
+                      onClick={() => setShowSelectionOptions(!showSelectionOptions)}
+                      className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
                     >
-                      Download PDF
+                      {showSelectionOptions ? 'Hide Selection Options' : 'Customize Sections'}
                     </button>
                     <button
                       onClick={previewPDF}
@@ -770,6 +837,13 @@ const ResumePreview = () => {
                     >
                       Preview PDF
                     </button>
+                    <button
+                      onClick={downloadPDF}
+                      className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700"
+                      disabled={!latexCode}
+                    >
+                      Download PDF
+                    </button>
                   </div>
                   <p className="text-sm text-gray-500 mt-2">
                     To get a perfectly formatted PDF, copy the LaTeX code and compile it using a LaTeX compiler
@@ -777,8 +851,83 @@ const ResumePreview = () => {
                   </p>
                 </div>
 
+                {/* Section Selection Options */}
+                {showSelectionOptions && (
+                  <div className="border border-gray-200 rounded-lg p-4 mb-6 bg-gray-50">
+                    <h2 className="text-lg font-semibold mb-4">Customize Your Resume</h2>
+                    <p className="text-sm text-gray-600 mb-4">
+                      Select which items to include in your resume. This is useful for tailoring your resume for specific job applications.
+                    </p>
+                    
+                    {resumeData?.experience && resumeData.experience.length > 0 && (
+                      <div className="mb-6">
+                        <h3 className="text-md font-medium mb-2">Work Experience</h3>
+                        <div className="space-y-2 ml-2">
+                          {resumeData.experience.map((exp, index) => (
+                            <div key={`exp-${index}`} className="flex items-center">
+                              <input
+                                type="checkbox"
+                                id={`exp-${index}`}
+                                checked={selectedExperiences[index] !== false}
+                                onChange={(e) => {
+                                  setSelectedExperiences({
+                                    ...selectedExperiences,
+                                    [index]: e.target.checked
+                                  });
+                                }}
+                                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                              />
+                              <label htmlFor={`exp-${index}`} className="ml-2 block text-sm text-gray-900">
+                                {exp.company} - {exp.position}
+                              </label>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    
+                    {resumeData?.projects && resumeData.projects.length > 0 && (
+                      <div className="mb-6">
+                        <h3 className="text-md font-medium mb-2">Projects</h3>
+                        <div className="space-y-2 ml-2">
+                          {resumeData.projects.map((project, index) => (
+                            <div key={`proj-${index}`} className="flex items-center">
+                              <input
+                                type="checkbox"
+                                id={`proj-${index}`}
+                                checked={selectedProjects[index] !== false}
+                                onChange={(e) => {
+                                  setSelectedProjects({
+                                    ...selectedProjects,
+                                    [index]: e.target.checked
+                                  });
+                                }}
+                                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                              />
+                              <label htmlFor={`proj-${index}`} className="ml-2 block text-sm text-gray-900">
+                                {project.title}
+                              </label>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="flex justify-end">
+                      <button
+                        onClick={() => {
+                          if (resumeData) generateCustomLatexCode(resumeData);
+                        }}
+                        className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
+                      >
+                        Apply Selection
+                      </button>
+                    </div>
+                  </div>
+                )}
+
                 {latexCode && (
-                  <div className="border border-gray-200 rounded-lg p-4">
+                  <div className="border border-gray-200 rounded-lg p-4 mb-6">
                     <h2 className="text-xl font-semibold mb-4">LaTeX Code</h2>
                     <div className="bg-gray-50 p-4 rounded overflow-auto max-h-96">
                       <pre className="text-xs text-gray-700 whitespace-pre-wrap">{latexCode}</pre>
@@ -786,7 +935,30 @@ const ResumePreview = () => {
                   </div>
                 )}
 
+                {/* PDF Preview Section - Shown directly on page */}
                 {pdfPreviewUrl && (
+                  <div className="border border-gray-200 rounded-lg p-4 mb-6">
+                    <div className="flex justify-between items-center mb-4">
+                      <h2 className="text-xl font-semibold">PDF Preview</h2>
+                      <button 
+                        onClick={closePreview}
+                        className="px-3 py-1 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+                      >
+                        Close Preview
+                      </button>
+                    </div>
+                    <div className="bg-white border border-gray-300 rounded">
+                      <iframe
+                        src={pdfPreviewUrl}
+                        title="PDF Preview"
+                        className="w-full h-[800px]"
+                      ></iframe>
+                    </div>
+                  </div>
+                )}
+
+                {/* Remove the modal version of PDF preview */}
+                {/* {pdfPreviewUrl && (
                   <div className="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50">
                     <div className="bg-white rounded-lg overflow-hidden shadow-xl transform transition-all max-w-3xl w-full">
                       <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
@@ -806,10 +978,10 @@ const ResumePreview = () => {
                       </div>
                     </div>
                   </div>
-                )}
+                )} */}
 
                 <div className="mt-8">
-                  <h2 className="text-xl font-semibold mb-4">Resume Preview</h2>
+                  <h2 className="text-xl font-semibold mb-4">HTML Resume Preview</h2>
                   <div className="border border-gray-200 rounded-lg p-6 bg-white">
                     {resumeData?.personalInfo && resumeData.personalInfo.name && (
                       <div className="text-center mb-6">
@@ -858,7 +1030,7 @@ const ResumePreview = () => {
                             </div>
                             <ul className="list-disc list-inside text-sm mt-1">
                               {exp.responsibilities.map((item, i) => (
-                                item && <li key={i}>{item}</li>
+                                item && <li key={i}>{parseBoldText(item)}</li>
                               ))}
                             </ul>
                           </div>
@@ -879,11 +1051,11 @@ const ResumePreview = () => {
                                 {project.liveUrl && <span>Demo</span>}
                               </div>
                             </div>
-                            <div className="text-sm mt-1">{project.description}</div>
+                            <div className="text-sm mt-1">{parseBoldText(project.description)}</div>
                             <div className="text-sm mt-1"><span className="font-medium">Technologies used:</span> {project.technologies}</div>
                             <ul className="list-disc list-inside text-sm mt-1">
                               {project.highlights.map((highlight, i) => (
-                                highlight && <li key={i}>{highlight}</li>
+                                highlight && <li key={i}>{parseBoldText(highlight)}</li>
                               ))}
                             </ul>
                           </div>
@@ -909,7 +1081,7 @@ const ResumePreview = () => {
                         <h2 className="text-lg font-semibold border-b border-gray-300 pb-1 mb-2">ACHIEVEMENTS</h2>
                         <ul className="list-disc list-inside text-sm">
                           {resumeData.achievements.map((achievement, index) => (
-                            <li key={index}><span className="font-medium">{achievement.title}:</span> {achievement.description}</li>
+                            <li key={index}><span className="font-medium">{achievement.title}:</span> {parseBoldText(achievement.description)}</li>
                           ))}
                         </ul>
                       </div>

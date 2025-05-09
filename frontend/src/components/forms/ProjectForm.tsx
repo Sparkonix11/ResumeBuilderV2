@@ -190,7 +190,8 @@ const ProjectForm = () => {
                         Project Description
                       </label>
                       <p className="text-xs text-gray-500 mb-2">
-                        Add bullet points describing key details and achievements of this project
+                        Add bullet points describing key details and achievements of this project.
+                        Use <strong>**text**</strong> format to bold important words or phrases.
                       </p>
                       
                       <FieldArray name="description">
@@ -201,7 +202,7 @@ const ProjectForm = () => {
                                 <div className="flex-grow mr-2">
                                   <Field
                                     name={`description.${index}`}
-                                    placeholder={`e.g., Implemented feature X that achieved Y result`}
+                                    placeholder={`e.g., Implemented **feature X** that achieved Y result`}
                                     type="text"
                                     className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                                   />

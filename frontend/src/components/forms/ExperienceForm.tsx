@@ -277,7 +277,8 @@ const ExperienceForm = () => {
                         Responsibilities & Achievements
                       </label>
                       <p className="text-xs text-gray-500 mb-2">
-                        Add bullet points describing your responsibilities and achievements at this position
+                        Add bullet points describing your responsibilities and achievements at this position.
+                        Use <strong>**text**</strong> format to bold important words or phrases.
                       </p>
                       
                       <FieldArray name="description">
@@ -288,7 +289,7 @@ const ExperienceForm = () => {
                                 <div className="flex-grow mr-2">
                                   <Field
                                     name={`description.${index}`}
-                                    placeholder={`e.g., Developed a feature that increased user engagement by 20%`}
+                                    placeholder={`e.g., Developed a **key feature** that increased user engagement by 20%`}
                                     type="text"
                                     className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                                   />

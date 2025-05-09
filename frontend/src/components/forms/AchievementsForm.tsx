@@ -141,6 +141,9 @@ const AchievementsForm = () => {
                         <label htmlFor="new-achievement" className="block text-sm font-medium text-gray-700">
                           Add Achievement
                         </label>
+                        <p className="text-xs text-gray-500 mb-2">
+                          Use <strong>**text**</strong> format to bold important words or phrases (e.g., "Received **Best Paper Award** at the conference").
+                        </p>
                         <div className="mt-1 flex rounded-md shadow-sm">
                           <input
                             type="text"
@@ -148,7 +151,7 @@ const AchievementsForm = () => {
                             value={currentAchievement}
                             onChange={(e) => setCurrentAchievement(e.target.value)}
                             className="flex-1 min-w-0 block w-full px-3 py-2 rounded-l-md border border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                            placeholder="E.g., Received Dean's List recognition for academic excellence"
+                            placeholder="E.g., Received **Dean's List** recognition for academic excellence"
                           />
                           <button
                             type="button"
