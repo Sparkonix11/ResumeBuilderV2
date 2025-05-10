@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "homepage": "https://sparkonix11.github.io/resume-builder",
+  "homepage": "https://Sparkonix11.github.io/ResumeBuilderV2",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",

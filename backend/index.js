@@ -22,7 +22,7 @@ connectDB();
 
 // CORS configuration - updated for GitHub Pages
 const corsOptions = {
-  origin: ['http://localhost:5173', 'https://sparkonix11.github.io'],
+  origin: ['http://localhost:5173', 'https://Sparkonix11.github.io'],
   credentials: true,
   optionsSuccessStatus: 200
 };

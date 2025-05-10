@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 const api = axios.create({
   baseURL: API_URL,
@@ -31,8 +31,8 @@ export const authAPI = {
 export const educationAPI = {
   getAll: () => api.get('/education'),
   getById: (id: string) => api.get(`/education/${id}`),
-  create: (data: any) => api.post('/education', data),
-  update: (id: string, data: any) => api.put(`/education/${id}`, data),
+  create: (data: unknown) => api.post('/education', data),
+  update: (id: string, data: unknown) => api.put(`/education/${id}`, data),
   delete: (id: string) => api.delete(`/education/${id}`),
 };
 
@@ -40,8 +40,8 @@ export const educationAPI = {
 export const experienceAPI = {
   getAll: () => api.get('/experience'),
   getById: (id: string) => api.get(`/experience/${id}`),
-  create: (data: any) => api.post('/experience', data),
-  update: (id: string, data: any) => api.put(`/experience/${id}`, data),
+  create: (data: unknown) => api.post('/experience', data),
+  update: (id: string, data: unknown) => api.put(`/experience/${id}`, data),
   delete: (id: string) => api.delete(`/experience/${id}`),
 };
 
@@ -49,32 +49,32 @@ export const experienceAPI = {
 export const projectsAPI = {
   getAll: () => api.get('/projects'),
   getById: (id: string) => api.get(`/projects/${id}`),
-  create: (data: any) => api.post('/projects', data),
-  update: (id: string, data: any) => api.put(`/projects/${id}`, data),
+  create: (data: unknown) => api.post('/projects', data),
+  update: (id: string, data: unknown) => api.put(`/projects/${id}`, data),
   delete: (id: string) => api.delete(`/projects/${id}`),
 };
 
 // Skills endpoints
 export const skillsAPI = {
   getAll: () => api.get('/skills'),
-  create: (data: any) => api.post('/skills', data),
-  update: (id: string, data: any) => api.put(`/skills/${id}`, data),
+  create: (data: unknown) => api.post('/skills', data),
+  update: (id: string, data: unknown) => api.put(`/skills/${id}`, data),
   delete: (id: string) => api.delete(`/skills/${id}`),
 };
 
 // Links endpoints
 export const linksAPI = {
   getAll: () => api.get('/links'),
-  create: (data: any) => api.post('/links', data),
-  update: (id: string, data: any) => api.put(`/links/${id}`, data),
+  create: (data: unknown) => api.post('/links', data),
+  update: (id: string, data: unknown) => api.put(`/links/${id}`, data),
   delete: (id: string) => api.delete(`/links/${id}`),
 };
 
 // Achievements endpoints
 export const achievementsAPI = {
   getAll: () => api.get('/achievements'),
-  create: (data: any) => api.post('/achievements', data),
-  update: (id: string, data: any) => api.put(`/achievements/${id}`, data),
+  create: (data: unknown) => api.post('/achievements', data),
+  update: (id: string, data: unknown) => api.put(`/achievements/${id}`, data),
   delete: (id: string) => api.delete(`/achievements/${id}`),
 };
 

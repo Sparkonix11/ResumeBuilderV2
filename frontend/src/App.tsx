@@ -35,7 +35,7 @@ function App() {
   }
 
   // Get the base URL for GitHub Pages deployment
-  const basename = import.meta.env.MODE === 'production' ? '/resume-builder' : ''
+  const basename = import.meta.env.MODE === 'production' ? '/ResumeBuilderV2' : ''
 
   return (
     <Router basename={basename}>
