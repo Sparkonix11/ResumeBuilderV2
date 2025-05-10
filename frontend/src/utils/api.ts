@@ -1,6 +1,11 @@
 import axios from 'axios';
 
+// Debug log to check if environment variables are correctly loaded
+console.log('Environment:', import.meta.env.MODE);
+console.log('API URL from env:', import.meta.env.VITE_API_URL);
+
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+console.log('Final API URL being used:', API_URL);
 
 const api = axios.create({
   baseURL: API_URL,

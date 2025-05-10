@@ -20,9 +20,9 @@ dotenv.config();
 // Connect to database
 connectDB();
 
-// CORS configuration - updated for GitHub Pages
+// CORS configuration - allowing all origins
 const corsOptions = {
-  origin: ['http://localhost:5173', 'https://Sparkonix11.github.io'],
+  origin: '*',
   credentials: true,
   optionsSuccessStatus: 200
 };
