@@ -2,7 +2,6 @@
 
 A full-stack application for creating professional resumes with LaTeX formatting, designed to be ATS-friendly and aesthetically pleasing.
 
-![Resume Builder](https://via.placeholder.com/800x400?text=Resume+Builder+Screenshot)
 
 ## Features
 
