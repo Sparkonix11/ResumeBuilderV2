@@ -20,8 +20,15 @@ dotenv.config();
 // Connect to database
 connectDB();
 
+// CORS configuration - updated for GitHub Pages
+const corsOptions = {
+  origin: ['http://localhost:5173', 'https://sparkonix11.github.io'],
+  credentials: true,
+  optionsSuccessStatus: 200
+};
+
 // Middleware
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

@@ -50,15 +50,16 @@ exports.updateUser = async (req, res) => {
     try {
         // Use the authenticated user's ID from req.user instead of params
         const userId = req.user.id;
-        const { name, phone } = req.body;
+        const { name, email, phone } = req.body;
         
         const user = await Users.findByPk(userId);
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
         
-        // Update only name and phone (not email and password)
+        // Update name, email, and phone
         user.name = name;
+        user.email = email;  // Now allowing email updates
         user.phone = phone;
         
         await user.save();

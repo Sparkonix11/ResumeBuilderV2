@@ -41,7 +41,8 @@ const ExperienceForm = () => {
     isCurrent: Yup.boolean(),
     endDate: Yup.string().when('isCurrent', {
       is: false,
-      then: Yup.string().required('End date is required unless currently working here')
+      then: (schema) => schema.required('End date is required unless currently working here'),
+      otherwise: (schema) => schema.notRequired()
     }),
     description: Yup.array().of(Yup.string().required('Responsibility cannot be empty')).min(1, 'Add at least one responsibility')
   });
@@ -284,7 +285,7 @@ const ExperienceForm = () => {
                       <FieldArray name="description">
                         {({ remove, push }) => (
                           <div>
-                            {values.description.map((item, index) => (
+                            {values.description.map((_, index) => (
                               <div key={index} className="flex mb-2">
                                 <div className="flex-grow mr-2">
                                   <Field

@@ -34,8 +34,11 @@ function App() {
     setIsAuthenticated(false)
   }
 
+  // Get the base URL for GitHub Pages deployment
+  const basename = import.meta.env.MODE === 'production' ? '/resume-builder' : ''
+
   return (
-    <Router>
+    <Router basename={basename}>
       <Routes>
         {/* Public routes */}
         <Route path="/login" element={
@@ -58,37 +61,37 @@ function App() {
         } />
         
         {/* Form routes */}
-        <Route path="/personal-info" element={
+        <Route path="/forms/personal-info" element={
           <PrivateRoute isAuthenticated={isAuthenticated}>
             <PersonalInfoForm />
           </PrivateRoute>
         } />
-        <Route path="/education" element={
+        <Route path="/forms/education" element={
           <PrivateRoute isAuthenticated={isAuthenticated}>
             <EducationForm />
           </PrivateRoute>
         } />
-        <Route path="/experience" element={
+        <Route path="/forms/experience" element={
           <PrivateRoute isAuthenticated={isAuthenticated}>
             <ExperienceForm />
           </PrivateRoute>
         } />
-        <Route path="/projects" element={
+        <Route path="/forms/projects" element={
           <PrivateRoute isAuthenticated={isAuthenticated}>
             <ProjectForm />
           </PrivateRoute>
         } />
-        <Route path="/skills" element={
+        <Route path="/forms/skills" element={
           <PrivateRoute isAuthenticated={isAuthenticated}>
             <SkillsForm />
           </PrivateRoute>
         } />
-        <Route path="/links" element={
+        <Route path="/forms/links" element={
           <PrivateRoute isAuthenticated={isAuthenticated}>
             <LinksForm />
           </PrivateRoute>
         } />
-        <Route path="/achievements" element={
+        <Route path="/forms/achievements" element={
           <PrivateRoute isAuthenticated={isAuthenticated}>
             <AchievementsForm />
           </PrivateRoute>

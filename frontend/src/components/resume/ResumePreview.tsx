@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../../utils/api';
-import { jsPDF } from 'jspdf';
 
 interface PersonalInfo {
   name: string;
@@ -10,6 +9,7 @@ interface PersonalInfo {
   linkedin?: string;
   github?: string;
   website?: string;
+  leetcode?: string; // Added to fix TS2339 error
 }
 
 interface Education {
@@ -610,35 +610,6 @@ const ResumePreview = () => {
     return `${monthNames[date.getMonth()]}. ${date.getFullYear()}`;
   };
 
-  // Function to parse markdown-style bold text (replace **text** with <strong> tags)
-  const parseBoldText = (text: string): JSX.Element => {
-    if (!text) return <></>;
-    
-    try {
-      // Split by ** markers
-      const parts = text.split(/(\*\*.*?\*\*)/g);
-      
-      return (
-        <>
-          {parts.map((part, i) => {
-            // Check if this part is surrounded by **
-            if (part.startsWith('**') && part.endsWith('**') && part.length > 4) {
-              // Extract the text between ** markers and make it bold
-              const boldText = part.slice(2, -2);
-              return <strong key={i}>{boldText}</strong>;
-            }
-            // Return regular text
-            return <span key={i}>{part}</span>;
-          })}
-        </>
-      );
-    } catch (error) {
-      // Fallback in case of any error
-      console.error("Error parsing bold text:", error);
-      return <>{text}</>;
-    }
-  };
-
   const escapeLatex = (text: any): string => {
     if (!text) return '';
     
@@ -957,137 +928,6 @@ const ResumePreview = () => {
                   </div>
                 )}
 
-                {/* Remove the modal version of PDF preview */}
-                {/* {pdfPreviewUrl && (
-                  <div className="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-lg overflow-hidden shadow-xl transform transition-all max-w-3xl w-full">
-                      <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                        <button
-                          onClick={closePreview}
-                          className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-                        >
-                          Close
-                        </button>
-                      </div>
-                      <div className="p-4">
-                        <iframe
-                          src={pdfPreviewUrl}
-                          title="PDF Preview"
-                          className="w-full h-96"
-                        ></iframe>
-                      </div>
-                    </div>
-                  </div>
-                )} */}
-
-                <div className="mt-8">
-                  <h2 className="text-xl font-semibold mb-4">HTML Resume Preview</h2>
-                  <div className="border border-gray-200 rounded-lg p-6 bg-white">
-                    {resumeData?.personalInfo && resumeData.personalInfo.name && (
-                      <div className="text-center mb-6">
-                        <h1 className="text-2xl font-bold">{resumeData.personalInfo.name}</h1>
-                        <p className="text-gray-600">
-                          {resumeData.personalInfo.phone} | {resumeData.personalInfo.email}
-                          {resumeData.personalInfo.website && ` | Portfolio`}
-                          {resumeData.personalInfo.linkedin && ` | LinkedIn`}
-                          {resumeData.personalInfo.github && ` | GitHub`}
-                          {resumeData.personalInfo.leetcode && ` | LeetCode`}
-                        </p>
-                      </div>
-                    )}
-
-                    {resumeData?.education && resumeData.education.length > 0 && (
-                      <div className="mb-6">
-                        <h2 className="text-lg font-semibold border-b border-gray-300 pb-1 mb-2">EDUCATION</h2>
-                        {resumeData.education.map((edu, index) => (
-                          <div key={index} className="mb-2">
-                            <div className="flex justify-between">
-                              <div className="font-semibold">{edu.institution}</div>
-                              <div>{edu.location}</div>
-                            </div>
-                            <div className="flex justify-between text-sm">
-                              <div className="italic">{`${edu.degree} in ${edu.field}`}</div>
-                              <div className="italic">{`${formatDate(edu.startDate)} - ${formatDate(edu.endDate)}`}</div>
-                            </div>
-                            {edu.gpa && <div className="text-sm">GPA: {edu.gpa}</div>}
-                          </div>
-                        ))}
-                      </div>
-                    )}
-
-                    {resumeData?.experience && resumeData.experience.length > 0 && (
-                      <div className="mb-6">
-                        <h2 className="text-lg font-semibold border-b border-gray-300 pb-1 mb-2">EXPERIENCE</h2>
-                        {resumeData.experience.map((exp, index) => (
-                          <div key={index} className="mb-4">
-                            <div className="flex justify-between">
-                              <div className="font-semibold">{exp.company}</div>
-                              <div>{exp.location}</div>
-                            </div>
-                            <div className="flex justify-between text-sm">
-                              <div className="italic">{exp.position}</div>
-                              <div className="italic">{`${formatDate(exp.startDate)} - ${exp.current ? 'Present' : formatDate(exp.endDate || '')}`}</div>
-                            </div>
-                            <ul className="list-disc list-inside text-sm mt-1">
-                              {exp.responsibilities.map((item, i) => (
-                                item && <li key={i}>{parseBoldText(item)}</li>
-                              ))}
-                            </ul>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-
-                    {resumeData?.projects && resumeData.projects.length > 0 && (
-                      <div className="mb-6">
-                        <h2 className="text-lg font-semibold border-b border-gray-300 pb-1 mb-2">PROJECTS</h2>
-                        {resumeData.projects.map((project, index) => (
-                          <div key={index} className="mb-4">
-                            <div className="flex justify-between">
-                              <div className="font-semibold">{project.title}</div>
-                              <div className="text-sm">
-                                {project.githubUrl && <span>GitHub </span>}
-                                {project.liveUrl && project.githubUrl && <span>| </span>}
-                                {project.liveUrl && <span>Demo</span>}
-                              </div>
-                            </div>
-                            <div className="text-sm mt-1">{parseBoldText(project.description)}</div>
-                            <div className="text-sm mt-1"><span className="font-medium">Technologies used:</span> {project.technologies}</div>
-                            <ul className="list-disc list-inside text-sm mt-1">
-                              {project.highlights.map((highlight, i) => (
-                                highlight && <li key={i}>{parseBoldText(highlight)}</li>
-                              ))}
-                            </ul>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-
-                    {resumeData?.skills && resumeData.skills.categories && resumeData.skills.categories.length > 0 && (
-                      <div className="mb-6">
-                        <h2 className="text-lg font-semibold border-b border-gray-300 pb-1 mb-2">TECHNICAL SKILLS</h2>
-                        <div className="space-y-1">
-                          {resumeData.skills.categories.map((category, index) => (
-                            <div key={index} className="text-sm">
-                              <span className="font-medium">{category.name}:</span> {category.skills.join(', ')}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {resumeData?.achievements && resumeData.achievements.length > 0 && (
-                      <div className="mb-6">
-                        <h2 className="text-lg font-semibold border-b border-gray-300 pb-1 mb-2">ACHIEVEMENTS</h2>
-                        <ul className="list-disc list-inside text-sm">
-                          {resumeData.achievements.map((achievement, index) => (
-                            <li key={index}><span className="font-medium">{achievement.title}:</span> {parseBoldText(achievement.description)}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                  </div>
-                </div>
               </div>
             )}
           </div>

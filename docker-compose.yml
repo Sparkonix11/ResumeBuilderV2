@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:14-alpine
+    container_name: resume-builder-postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=resumeuser
+      - POSTGRES_PASSWORD=resumepassword
+      - POSTGRES_DB=resumebuilder
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - resume-builder-network
+
+  # Backend service
+  backend:
+    build: ./backend
+    container_name: resume-builder-backend
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      - NODE_ENV=production
+      - DB_DIALECT=postgres
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=resumebuilder
+      - DB_USER=resumeuser
+      - DB_PASSWORD=resumepassword
+      - JWT_SECRET=your_jwt_secret_key_change_in_production
+    depends_on:
+      - postgres
+    networks:
+      - resume-builder-network
+
+  # Frontend service
+  frontend:
+    build: ./frontend
+    container_name: resume-builder-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - resume-builder-network
+
+networks:
+  resume-builder-network:
+    driver: bridge
+
+volumes:
+  postgres-data:
+    driver: local

@@ -197,7 +197,7 @@ const ProjectForm = () => {
                       <FieldArray name="description">
                         {({ remove, push }) => (
                           <div>
-                            {values.description.map((item, index) => (
+                            {values.description.map((_, index) => (
                               <div key={index} className="flex mb-2">
                                 <div className="flex-grow mr-2">
                                   <Field

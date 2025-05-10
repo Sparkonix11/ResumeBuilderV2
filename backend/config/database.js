@@ -12,27 +12,45 @@ const DB_USER = process.env.DB_USER || 'user';
 const DB_PASSWORD = process.env.DB_PASSWORD || 'password';
 const DB_STORAGE = process.env.DB_STORAGE || './database.sqlite';
 
-const sequelize = new Sequelize(
-    DB_DIALECT === 'sqlite'
-        ? { 
-            dialect: DB_DIALECT, 
-            storage: DB_STORAGE,
-            logging: process.env.DB_LOGGING === 'true' ? console.log : false,
-            define: {
-                // Add ON DELETE CASCADE for all associations
-                hooks: true
-            }
-          }
-        : {
-              dialect: DB_DIALECT,
-              host: DB_HOST,
-              port: DB_PORT,
-              database: DB_NAME,
-              username: DB_USER,
-              password: DB_PASSWORD,
-              logging: process.env.DB_LOGGING === 'true' ? console.log : false,
-          }
-);
+// Configure database connection options based on dialect
+const sequelizeOptions = DB_DIALECT === 'sqlite'
+    ? { 
+        dialect: DB_DIALECT, 
+        storage: DB_STORAGE,
+        logging: process.env.DB_LOGGING === 'true' ? console.log : false,
+        define: {
+            // Add ON DELETE CASCADE for all associations
+            hooks: true
+        },
+        retry: {
+            max: 5,
+            match: [
+                /SQLITE_BUSY/,
+                /SQLITE_LOCKED/
+            ]
+        }
+      }
+    : {
+        dialect: DB_DIALECT,
+        host: DB_HOST,
+        port: DB_PORT,
+        database: DB_NAME,
+        username: DB_USER,
+        password: DB_PASSWORD,
+        logging: process.env.DB_LOGGING === 'true' ? console.log : false,
+        pool: {
+            max: 10,
+            min: 0,
+            acquire: 30000,
+            idle: 10000
+        },
+        define: {
+            // Add ON DELETE CASCADE for all associations
+            hooks: true
+        }
+    };
+
+const sequelize = new Sequelize(sequelizeOptions);
 
 // Import models and initialize them with sequelize
 const Users = require('../models/Users')(sequelize);
@@ -88,15 +106,28 @@ Skills.belongsTo(Users, { foreignKey: 'userId' });
 
 const connectDB = async () => {
     try {
-        await sequelize.authenticate();
+        // Increase connection retries for Docker startup
+        let retries = 10;
         
-        // Only use sync in development mode
-        if (NODE_ENV === 'development') {
-            // Use force: false and alter: false to prevent repeated table rebuilding
-            // Only update database schema once during first application run
-            await sequelize.sync({ force: false, alter: false });
-            console.log('Database synchronized');
+        while (retries) {
+            try {
+                await sequelize.authenticate();
+                break;
+            } catch (error) {
+                if (retries <= 1) {
+                    throw error;
+                }
+                console.log(`Database connection failed. Retries left: ${retries}`);
+                retries -= 1;
+                // Wait for 5 seconds before retrying
+                await new Promise(res => setTimeout(res, 5000));
+            }
         }
+        
+        // In production, sync with alter: true to safely update schema
+        // without dropping tables
+        await sequelize.sync({ force: false, alter: true });
+        console.log('Database synchronized');
         
         console.log('Database connection has been established successfully.');
     } catch (error) {

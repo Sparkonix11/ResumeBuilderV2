@@ -42,7 +42,8 @@ const EducationForm = () => {
     isCurrent: Yup.boolean(),
     endDate: Yup.string().when('isCurrent', {
       is: false,
-      then: Yup.string().required('End date is required unless currently studying')
+      then: (schema) => schema.required('End date is required unless currently studying'),
+      otherwise: (schema) => schema.notRequired()
     })
   });
 
