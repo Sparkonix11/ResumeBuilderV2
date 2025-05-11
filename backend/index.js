@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
+var morgan = require('morgan');
 const { connectDB } = require('./config/database');
 
 // Import routes
@@ -13,6 +14,7 @@ const linksRoutes = require('./routes/links');
 const achievementsRoutes = require('./routes/achievements');
 const usersRoutes = require('./routes/users');
 const latexRoutes = require('./routes/latex');
+const morgan = require('morgan');
 
 const app = express();
 dotenv.config();
@@ -31,6 +33,7 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(morgan('dev'));
 
 // Base route
 app.get('/', (req, res) => {
