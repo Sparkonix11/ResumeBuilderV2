@@ -27,6 +27,16 @@ const SKILL_CATEGORIES = [
   'Webdevelopment'
 ];
 
+const CATEGORY_DISPLAY_NAMES: {[key: string]: string} = {
+  'Languages': 'Languages',
+  'Visualization': 'Data Analysis & Visualization',
+  'Cloud': 'Cloud',
+  'Frameworks': 'Frameworks & Libraries',
+  'Database': 'Database',
+  'Tools': 'Tools & Technologies',
+  'Webdevelopment': 'Web Development'
+};
+
 const SkillsForm = () => {
   const [skills, setSkills] = useState<Skills | null>(null);
   const [loading, setLoading] = useState(true);
@@ -182,7 +192,7 @@ const SkillsForm = () => {
                           >
                             {SKILL_CATEGORIES.map((category) => (
                               <option key={category} value={category}>
-                                {category}
+                                {CATEGORY_DISPLAY_NAMES[category]}
                               </option>
                             ))}
                           </select>
@@ -193,7 +203,7 @@ const SkillsForm = () => {
                             type="text"
                             value={currentSkill}
                             onChange={(e) => setCurrentSkill(e.target.value)}
-                            placeholder={`Add a new ${currentCategory} skill`}
+                            placeholder={`Add a new ${CATEGORY_DISPLAY_NAMES[currentCategory]} skill`}
                             className="flex-grow mt-1 block w-full border border-gray-300 rounded-l-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                           />
                           <button
@@ -209,7 +219,7 @@ const SkillsForm = () => {
                       {/* Display all categories and skills */}
                       {SKILL_CATEGORIES.map((category) => (
                         <div key={category} className="sm:col-span-6">
-                          <h3 className="text-lg font-medium text-gray-900 mb-2">{category}</h3>
+                          <h3 className="text-lg font-medium text-gray-900 mb-2">{CATEGORY_DISPLAY_NAMES[category]}</h3>
                           <div className="flex flex-wrap gap-2">
                             {(values[category as keyof Skills] as string[] || []).map((skill, index) => (
                               <div 

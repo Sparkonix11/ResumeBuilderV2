@@ -71,6 +71,16 @@ const ResumePreview = () => {
   const [selectedExperiences, setSelectedExperiences] = useState<{ [id: string]: boolean }>({});
   const [showSelectionOptions, setShowSelectionOptions] = useState<boolean>(false);
 
+  const CATEGORY_DISPLAY_NAMES: {[key: string]: string} = {
+    'Languages': 'Languages',
+    'Visualization': 'Data Analysis & Visualization',
+    'Cloud': 'Cloud',
+    'Frameworks': 'Frameworks & Libraries',
+    'Database': 'Database',
+    'Tools': 'Tools & Technologies',
+    'Webdevelopment': 'Web Development'
+  };
+
   useEffect(() => {
     const fetchResumeData = async () => {
       try {
@@ -187,9 +197,10 @@ const ResumePreview = () => {
               // Map skills data based on available categories in the database
               Object.keys(skillsData).forEach(category => {
                 if (Array.isArray(skillsData[category]) && skillsData[category].length > 0) {
-                  const formattedCategory = category.charAt(0).toUpperCase() + category.slice(1);
+                  const displayName = CATEGORY_DISPLAY_NAMES[category] || 
+                    (category.charAt(0).toUpperCase() + category.slice(1));
                   categories.push({
-                    name: formattedCategory,
+                    name: displayName,
                     skills: skillsData[category]
                   });
                 }
@@ -580,16 +591,16 @@ const ResumePreview = () => {
 
     // Add a Relevant Coursework section if you have this data
     // You'll need to update your data model to include coursework
-    latex += `%-----------RELEVANT COURSEWORK-----------
-\\section{Relevant Coursework}
-\\begin{itemize}[itemsep=1pt,label=\\scriptsize\\textbullet]
-  \\resumeItem{Programming in Python, Programming Concepts using Java, Data Structures and Algorithms}
-  \\resumeItem{Database Management Systems, System Commands, Software Engineering, Software Testing}
-  \\resumeItem{Modern Application Development, Computational Thinking}
-  \\resumeItem{Mathematics for Data Science, Statistics for Data Science}
-\\end{itemize}
+//     latex += `%-----------RELEVANT COURSEWORK-----------
+// \\section{Relevant Coursework}
+// \\begin{itemize}[itemsep=1pt,label=\\scriptsize\\textbullet]
+//   \\resumeItem{Programming in Python, Programming Concepts using Java, Data Structures and Algorithms}
+//   \\resumeItem{Database Management Systems, System Commands, Software Engineering, Software Testing}
+//   \\resumeItem{Modern Application Development, Computational Thinking}
+//   \\resumeItem{Mathematics for Data Science, Statistics for Data Science}
+// \\end{itemize}
 
-`;
+// `;
 
     latex += `%-------------------------------------------
 \\end{document}

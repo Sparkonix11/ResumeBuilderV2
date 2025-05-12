@@ -117,13 +117,13 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
 
   // Ensure all array items have the optional property explicitly set
   const sections = [
-    { id: 'personalInfo', name: 'Personal Information', path: '/personal-info', status: sectionStatus.personalInfo, optional: false },
-    { id: 'education', name: 'Education', path: '/education', status: sectionStatus.education, optional: false },
-    { id: 'experience', name: 'Work Experience (Optional)', path: '/experience', status: sectionStatus.experience, optional: true },
-    { id: 'projects', name: 'Projects', path: '/projects', status: sectionStatus.projects, optional: false },
-    { id: 'skills', name: 'Skills', path: '/skills', status: sectionStatus.skills, optional: false },
-    { id: 'achievements', name: 'Achievements', path: '/achievements', status: sectionStatus.achievements, optional: false },
-    { id: 'links', name: 'Links', path: '/links', status: sectionStatus.links, optional: false }
+    { id: 'personalInfo', name: 'Personal Information', path: '/forms/personal-info', status: sectionStatus.personalInfo, optional: false },
+    { id: 'education', name: 'Education', path: '/forms/education', status: sectionStatus.education, optional: false },
+    { id: 'experience', name: 'Work Experience (Optional)', path: '/forms/experience', status: sectionStatus.experience, optional: true },
+    { id: 'projects', name: 'Projects', path: '/forms/projects', status: sectionStatus.projects, optional: false },
+    { id: 'skills', name: 'Skills', path: '/forms/skills', status: sectionStatus.skills, optional: false },
+    { id: 'achievements', name: 'Achievements', path: '/forms/achievements', status: sectionStatus.achievements, optional: false },
+    { id: 'links', name: 'Links', path: '/forms/links', status: sectionStatus.links, optional: false }
   ];
 
   return (
