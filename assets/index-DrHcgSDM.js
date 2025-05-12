@@ -211,7 +211,18 @@ attempted value: ${d}
       {${N(ee.degree)} in ${N(ee.field)}}{${$(ee.startDate)} -- ${ee.endDate?$(ee.endDate):"Present"}}`,ee.gpa&&(J+=`\\newline{\\textbf{GPA}: ${N(ee.gpa)}}`)}),J+=`
   \\resumeSubHeadingListEnd
 
-`),K.projects&&K.projects.length>0){const ee=K.projects.filter((P,W)=>j[W]!==!1);ee.length>0&&(J+=`%-----------PROJECTS-----------
+`),K.experience&&K.experience.length>0){const ee=K.experience.filter((P,W)=>w[W]!==!1);ee.length>0&&(J+=`%-----------EXPERIENCE-----------
+    \\section{Experience}
+      \\resumeSubHeadingListStart
+    `,ee.forEach(P=>{J+=`    \\resumeSubheading
+          {${N(P.company)}}{${N(P.location)}}
+          {${N(P.position)}}{${$(P.startDate)} -- ${P.current?"Present":$(P.endDate||"")}}
+          \\resumeItemListStart`,Array.isArray(P.responsibilities)&&P.responsibilities.forEach(W=>{W.trim()&&(J+=`
+            \\resumeItem{${N(W)}}`)}),J+=`
+          \\resumeItemListEnd`}),J+=`
+      \\resumeSubHeadingListEnd
+    
+    `)}if(K.projects&&K.projects.length>0){const ee=K.projects.filter((P,W)=>j[W]!==!1);ee.length>0&&(J+=`%-----------PROJECTS-----------
 \\section{Projects}
   \\resumeSubHeadingListStart
 `,ee.forEach(P=>{let W="";P.githubUrl&&(W=`\\href{${N(P.githubUrl)}}{\\underline{GitHub}}`),J+=`    \\resumeSubheading
@@ -220,17 +231,6 @@ attempted value: ${d}
       \\resumeItemListStart`,Array.isArray(P.highlights)?P.highlights.forEach(k=>{k.trim()&&(J+=`
         \\resumeItem{${N(k)}}`)}):P.description&&(J+=`
         \\resumeItem{${N(P.description)}}`),J+=`
-      \\resumeItemListEnd`}),J+=`
-  \\resumeSubHeadingListEnd
-
-`)}if(K.experience&&K.experience.length>0){const ee=K.experience.filter((P,W)=>w[W]!==!1);ee.length>0&&(J+=`%-----------EXPERIENCE-----------
-\\section{Experience}
-  \\resumeSubHeadingListStart
-`,ee.forEach(P=>{J+=`    \\resumeSubheading
-      {${N(P.company)}}{${N(P.location)}}
-      {${N(P.position)}}{${$(P.startDate)} -- ${P.current?"Present":$(P.endDate||"")}}
-      \\resumeItemListStart`,Array.isArray(P.responsibilities)&&P.responsibilities.forEach(W=>{W.trim()&&(J+=`
-        \\resumeItem{${N(W)}}`)}),J+=`
       \\resumeItemListEnd`}),J+=`
   \\resumeSubHeadingListEnd
 
