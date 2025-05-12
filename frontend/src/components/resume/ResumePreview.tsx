@@ -468,6 +468,43 @@ const ResumePreview = () => {
 `;
     }
 
+        // Experience Section
+        if (data.experience && data.experience.length > 0) {
+          // Filter out unselected experiences
+          const filteredExperiences = data.experience.filter((_, index) => selectedExperiences[index] !== false);
+          
+          if (filteredExperiences.length > 0) {
+            latex += `%-----------EXPERIENCE-----------
+    \\section{Experience}
+      \\resumeSubHeadingListStart
+    `;
+    
+            filteredExperiences.forEach(exp => {
+              latex += `    \\resumeSubheading
+          {${escapeLatex(exp.company)}}{${escapeLatex(exp.location)}}
+          {${escapeLatex(exp.position)}}{${formatDate(exp.startDate)} -- ${exp.current ? 'Present' : formatDate(exp.endDate || '')}}
+          \\resumeItemListStart`;
+    
+              if (Array.isArray(exp.responsibilities)) {
+                exp.responsibilities.forEach(responsibility => {
+                  if (responsibility.trim()) {
+                    latex += `
+            \\resumeItem{${escapeLatex(responsibility)}}`;
+                  }
+                });
+              }
+    
+              latex += `
+          \\resumeItemListEnd`;
+            });
+    
+            latex += `
+      \\resumeSubHeadingListEnd
+    
+    `;
+        }
+      }
+
     // Projects Section (prioritized as shown in your template)
     if (data.projects && data.projects.length > 0) {
       // Filter out unselected projects
@@ -501,43 +538,6 @@ const ResumePreview = () => {
             // Only add description if no highlights are available
             latex += `
         \\resumeItem{${escapeLatex(project.description)}}`;
-          }
-
-          latex += `
-      \\resumeItemListEnd`;
-        });
-
-        latex += `
-  \\resumeSubHeadingListEnd
-
-`;
-      }
-    }
-
-    // Experience Section
-    if (data.experience && data.experience.length > 0) {
-      // Filter out unselected experiences
-      const filteredExperiences = data.experience.filter((_, index) => selectedExperiences[index] !== false);
-      
-      if (filteredExperiences.length > 0) {
-        latex += `%-----------EXPERIENCE-----------
-\\section{Experience}
-  \\resumeSubHeadingListStart
-`;
-
-        filteredExperiences.forEach(exp => {
-          latex += `    \\resumeSubheading
-      {${escapeLatex(exp.company)}}{${escapeLatex(exp.location)}}
-      {${escapeLatex(exp.position)}}{${formatDate(exp.startDate)} -- ${exp.current ? 'Present' : formatDate(exp.endDate || '')}}
-      \\resumeItemListStart`;
-
-          if (Array.isArray(exp.responsibilities)) {
-            exp.responsibilities.forEach(responsibility => {
-              if (responsibility.trim()) {
-                latex += `
-        \\resumeItem{${escapeLatex(responsibility)}}`;
-              }
-            });
           }
 
           latex += `
